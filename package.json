@@ -1,0 +1,25 @@
+{
+  "name": "picset-desktop",
+  "version": "0.1.0",
+  "description": "Secure Electron shell for PicSet Web",
+  "private": true,
+  "main": "src/main.cjs",
+  "engines": {
+    "node": ">=24.18.0"
+  },
+  "scripts": {
+    "start": "npm run generate:runtime-config && electron .",
+    "test": "node --test",
+    "generate:runtime-config": "node scripts/generate-runtime-config.mjs",
+    "assert:release-version": "node scripts/assert-release-version.mjs",
+    "package:dir": "npm run generate:runtime-config && electron-builder --dir --publish never",
+    "package:mac:x64": "npm run generate:runtime-config && electron-builder --mac --x64 --publish never",
+    "package:mac:arm64": "npm run generate:runtime-config && electron-builder --mac --arm64 --publish never",
+    "package:win:x64": "npm run generate:runtime-config && electron-builder --win --x64 --publish never"
+  },
+  "devDependencies": {
+    "@electron/notarize": "3.1.1",
+    "electron": "43.2.0",
+    "electron-builder": "26.15.3"
+  }
+}
