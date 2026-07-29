@@ -59,7 +59,7 @@ added in a future release.
 |  |- runtime-config.test.mjs
 |  |- navigation-policy.test.mjs
 |  `- release-version.test.mjs
-|- electron-builder.yml
+|- electron-builder.cjs
 |- package.json
 `- package-lock.json
 ```
@@ -67,6 +67,10 @@ added in a future release.
 `build/generated/` is ignored by Git. It contains the transient runtime JSON
 created during a local package or GitHub Actions job. Electron Builder copies
 that JSON into the installed app resources directory.
+
+The Builder configuration uses CJS rather than YAML so it can enable hardened
+runtime, signing, and notarization only when the complete platform credential
+set is present. This changes no approved release target or runtime behavior.
 
 ## Runtime Architecture
 
