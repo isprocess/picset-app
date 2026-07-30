@@ -8,6 +8,7 @@ const {
 } = require('./runtime-config.cjs')
 const { shouldShowLoadFailure } = require('./load-failure-policy.cjs')
 const { applyNavigationPolicy } = require('./navigation-policy.cjs')
+const { applyAuthenticatedWindowState } = require('./window-state-policy.cjs')
 const { createMainWindowOptions } = require('./window-options.cjs')
 
 let desktopConfig
@@ -64,6 +65,10 @@ function createMainWindow() {
     webContents: window.webContents,
     allowedOrigin: desktopConfig.webUrl,
     openExternalUrl,
+  })
+  applyAuthenticatedWindowState({
+    window,
+    allowedOrigin: desktopConfig.webUrl,
   })
   window.webContents.on(
     'did-fail-load',

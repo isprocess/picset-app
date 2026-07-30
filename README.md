@@ -15,6 +15,9 @@ PicSet Desktop is a secure Electron shell for the hosted PicSet Web service.
 - Same-origin navigation remains in the desktop app. Credential-free external
   HTTPS links open in the operating system browser; other external protocols
   are denied.
+- Electron's stock application menu is removed.
+- The `/login` page keeps the initial window size. The first authenticated
+  same-origin page maximizes the window, and later navigation does not resize it.
 
 ## Local Development
 

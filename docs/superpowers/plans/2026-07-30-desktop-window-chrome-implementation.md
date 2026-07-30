@@ -95,7 +95,7 @@ git commit -m "feat: remove default desktop menu"
 - Consumes: a `BrowserWindow`, its `webContents` navigation events, and the validated allowed origin.
 - Produces: `applyAuthenticatedWindowState({ window, allowedOrigin })` and `shouldMaximizeForNavigation(rawUrl, allowedOrigin)`.
 
-- [ ] **Step 1: Write failing policy tests**
+- [x] **Step 1: Write failing policy tests**
 
 ```js
 import assert from 'node:assert/strict'
@@ -151,13 +151,13 @@ test('rejects invalid and cross-origin navigation', () => {
 })
 ```
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run: `node test/window-state-policy.test.mjs`
 
 Expected: FAIL because `src/window-state-policy.cjs` does not exist.
 
-- [ ] **Step 3: Implement and wire the window-state policy**
+- [x] **Step 3: Implement and wire the window-state policy**
 
 ```js
 const { normalizeDesktopWebUrl } = require('./runtime-config.cjs')
@@ -201,19 +201,19 @@ applyAuthenticatedWindowState({
 })
 ```
 
-- [ ] **Step 4: Document the visible behavior**
+- [x] **Step 4: Document the visible behavior**
 
 Add README architecture bullets stating that the stock Electron menu is absent,
 the login page uses the initial window size, and authenticated content is
 maximized once.
 
-- [ ] **Step 5: Run focused and full verification**
+- [x] **Step 5: Run focused and full verification**
 
 Run: `node test/window-state-policy.test.mjs && npm test && git diff --check`
 
 Expected: all tests pass and the diff check is clean.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/window-state-policy.cjs test/window-state-policy.test.mjs src/main.cjs README.md
