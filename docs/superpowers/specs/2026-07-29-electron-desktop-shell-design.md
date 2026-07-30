@@ -118,7 +118,9 @@ The unauthenticated `/login` page retains the initial 1440 by 900 window size.
 The main process observes completed same-origin main-frame navigation. The
 first navigation to any pathname other than `/login` maximizes the window,
 including startup with an already-authenticated session. The shell does not
-shrink the window automatically if the user later returns to `/login`.
+shrink the window automatically if the user later returns to `/login`. If an
+authenticated startup navigation completes while the window is still hidden,
+maximization waits for `ready-to-show` to avoid displaying an unfinished page.
 
 The standard persistent Electron session is used. Cookies and browser storage
 therefore remain in the operating system user profile, allowing the existing

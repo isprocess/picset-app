@@ -9,7 +9,7 @@ const {
 } = windowStatePolicy
 const allowedOrigin = 'https://picset.example.test'
 
-function createWindowHarness() {
+function createWindowHarness({ visible = true } = {}) {
   const handlers = new Map()
   let maximizeCalls = 0
 
@@ -20,11 +20,19 @@ function createWindowHarness() {
       },
     },
     isDestroyed: () => false,
+    isVisible: () => visible,
+    once(eventName, handler) {
+      handlers.set(`once:${eventName}`, handler)
+    },
     maximize() {
       maximizeCalls += 1
     },
     navigate(url) {
       handlers.get('did-navigate')({}, url)
+    },
+    readyToShow() {
+      visible = true
+      handlers.get('once:ready-to-show')?.()
     },
     get maximizeCalls() {
       return maximizeCalls
@@ -41,6 +49,17 @@ test('keeps login at the initial size and maximizes once after login', () => {
 
   window.navigate('https://picset.example.test/')
   window.navigate('https://picset.example.test/short-drama')
+  assert.equal(window.maximizeCalls, 1)
+})
+
+test('defers an authenticated startup maximize until ready to show', () => {
+  const window = createWindowHarness({ visible: false })
+
+  applyAuthenticatedWindowState({ window, allowedOrigin })
+  window.navigate('https://picset.example.test/')
+  assert.equal(window.maximizeCalls, 0)
+
+  window.readyToShow()
   assert.equal(window.maximizeCalls, 1)
 })
 

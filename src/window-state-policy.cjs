@@ -28,7 +28,14 @@ function applyAuthenticatedWindowState({ window, allowedOrigin }) {
     if (!shouldMaximizeForNavigation(url, allowedOrigin)) return
 
     hasMaximized = true
-    window.maximize()
+    if (window.isVisible()) {
+      window.maximize()
+      return
+    }
+
+    window.once('ready-to-show', () => {
+      if (!window.isDestroyed()) window.maximize()
+    })
   })
 }
 
