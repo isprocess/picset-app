@@ -76,9 +76,8 @@ set is present. This changes no approved release target or runtime behavior.
 
 ### Config Injection
 
-`PICSET_DESKTOP_WEB_URL` is supplied by the GitHub Actions `release`
-Environment or repository Actions Variable. It is a public deployment setting,
-not a secret.
+`PICSET_DESKTOP_WEB_URL` is supplied only by the GitHub Actions `release`
+Environment Variable. It is a public deployment setting, not a secret.
 
 The package-time generator validates the value before creating the runtime
 configuration. It accepts only an HTTPS root origin with these properties:
@@ -184,9 +183,9 @@ partial cross-platform release.
 ### Configuration Scope
 
 All release jobs use the protected GitHub Actions Environment named `release`.
-`PICSET_DESKTOP_WEB_URL` can be defined as a `release` Environment Variable or
-a repository Actions Variable. The workflow reads it through the `vars` context
-and passes it to the configuration generator as an environment variable.
+`PICSET_DESKTOP_WEB_URL` is defined only as a `release` Environment Variable.
+The workflow reads it through the `vars` context and passes it to the
+configuration generator as an environment variable.
 
 The workflow must never echo the generated config or any Secrets to job output.
 Build logs can name the configuration variable but must not print its value.
