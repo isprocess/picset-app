@@ -22,4 +22,29 @@ function classifyNavigation(rawUrl, allowedOrigin) {
   return { kind: 'external', url: normalizedTarget }
 }
 
-module.exports = { classifyNavigation }
+function applyNavigationPolicy({ webContents, allowedOrigin, openExternalUrl }) {
+  const handleMainFrameNavigation = (details) => {
+    if (!details.isMainFrame) return
+
+    const decision = classifyNavigation(details.url, allowedOrigin)
+    if (decision.kind === 'same-origin') return
+
+    details.preventDefault()
+    if (decision.kind === 'external') openExternalUrl(decision.url)
+  }
+
+  webContents.setWindowOpenHandler(({ url }) => {
+    const decision = classifyNavigation(url, allowedOrigin)
+    if (decision.kind === 'external') openExternalUrl(decision.url)
+    return { action: 'deny' }
+  })
+
+  webContents.on('will-navigate', handleMainFrameNavigation)
+  webContents.on('will-redirect', handleMainFrameNavigation)
+  webContents.on('will-attach-webview', (event) => event.preventDefault())
+}
+
+module.exports = {
+  applyNavigationPolicy,
+  classifyNavigation,
+}

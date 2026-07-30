@@ -6,7 +6,7 @@ const {
   resolveRuntimeConfigPath,
 } = require('./runtime-config.cjs')
 const { shouldShowLoadFailure } = require('./load-failure-policy.cjs')
-const { classifyNavigation } = require('./navigation-policy.cjs')
+const { applyNavigationPolicy } = require('./navigation-policy.cjs')
 const { createMainWindowOptions } = require('./window-options.cjs')
 
 let desktopConfig
@@ -50,24 +50,6 @@ async function showLoadFailure(window) {
   }
 }
 
-function applyNavigationPolicy(window) {
-  window.webContents.setWindowOpenHandler(({ url }) => {
-    const decision = classifyNavigation(url, desktopConfig.webUrl)
-    if (decision.kind === 'external') openExternalUrl(decision.url)
-    return { action: 'deny' }
-  })
-
-  window.webContents.on('will-navigate', (event, url) => {
-    const decision = classifyNavigation(url, desktopConfig.webUrl)
-    if (decision.kind === 'same-origin') return
-
-    event.preventDefault()
-    if (decision.kind === 'external') openExternalUrl(decision.url)
-  })
-
-  window.webContents.on('will-attach-webview', (event) => event.preventDefault())
-}
-
 function loadConfiguredPage(window) {
   void window.loadURL(desktopConfig.webUrl).catch(() => {
     void showLoadFailure(window)
@@ -77,7 +59,11 @@ function loadConfiguredPage(window) {
 function createMainWindow() {
   const window = new BrowserWindow(createMainWindowOptions())
 
-  applyNavigationPolicy(window)
+  applyNavigationPolicy({
+    webContents: window.webContents,
+    allowedOrigin: desktopConfig.webUrl,
+    openExternalUrl,
+  })
   window.webContents.on(
     'did-fail-load',
     (_event, errorCode, _errorDescription, _validatedUrl, isMainFrame) => {
