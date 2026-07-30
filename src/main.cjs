@@ -1,5 +1,6 @@
-const { app, BrowserWindow, dialog, session, shell } = require('electron')
+const { app, BrowserWindow, dialog, Menu, session, shell } = require('electron')
 
+const { removeDefaultApplicationMenu } = require('./application-menu-policy.cjs')
 const {
   RuntimeConfigError,
   loadRuntimeConfig,
@@ -84,6 +85,7 @@ function createMainWindow() {
 
 async function bootstrap() {
   await app.whenReady()
+  removeDefaultApplicationMenu(Menu)
 
   try {
     desktopConfig = loadRuntimeConfig(

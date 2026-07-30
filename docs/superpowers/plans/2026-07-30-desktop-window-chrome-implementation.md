@@ -28,7 +28,7 @@
 - Consumes: Electron's `Menu` module.
 - Produces: `removeDefaultApplicationMenu(menu)`.
 
-- [ ] **Step 1: Write the failing menu policy test**
+- [x] **Step 1: Write the failing menu policy test**
 
 ```js
 import assert from 'node:assert/strict'
@@ -49,13 +49,13 @@ test('suppresses the default Electron application menu', () => {
 })
 ```
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run: `node test/application-menu-policy.test.mjs`
 
 Expected: FAIL because `src/application-menu-policy.cjs` does not exist.
 
-- [ ] **Step 3: Implement and wire the menu policy**
+- [x] **Step 3: Implement and wire the menu policy**
 
 ```js
 function removeDefaultApplicationMenu(menu) {
@@ -68,13 +68,13 @@ module.exports = { removeDefaultApplicationMenu }
 Import `Menu` and call `removeDefaultApplicationMenu(Menu)` after
 `app.whenReady()` resolves and before `createMainWindow()`.
 
-- [ ] **Step 4: Run focused and full tests**
+- [x] **Step 4: Run focused and full tests**
 
 Run: `node test/application-menu-policy.test.mjs && npm test`
 
 Expected: all tests pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/application-menu-policy.cjs test/application-menu-policy.test.mjs src/main.cjs
