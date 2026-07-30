@@ -9,8 +9,10 @@ const {
 } = windowStatePolicy
 const allowedOrigin = 'https://picset.example.test'
 
-function createWindowHarness({ visible = true } = {}) {
+function createWindowHarness() {
   const handlers = new Map()
+  const lifecycleEvents = []
+  let visible = false
   let maximizeCalls = 0
 
   return {
@@ -24,16 +26,24 @@ function createWindowHarness({ visible = true } = {}) {
     once(eventName, handler) {
       handlers.set(`once:${eventName}`, handler)
     },
+    show() {
+      visible = true
+      lifecycleEvents.push('show')
+    },
     maximize() {
       maximizeCalls += 1
+      lifecycleEvents.push('maximize')
+    },
+    hide() {
+      visible = false
     },
     navigate(url) {
       handlers.get('did-navigate')({}, url)
     },
     readyToShow() {
-      visible = true
       handlers.get('once:ready-to-show')?.()
     },
+    lifecycleEvents,
     get maximizeCalls() {
       return maximizeCalls
     },
@@ -45,21 +55,36 @@ test('keeps login at the initial size and maximizes once after login', () => {
 
   applyAuthenticatedWindowState({ window, allowedOrigin })
   window.navigate('https://picset.example.test/login?next=%2F')
+  window.readyToShow()
   assert.equal(window.maximizeCalls, 0)
 
   window.navigate('https://picset.example.test/')
   window.navigate('https://picset.example.test/short-drama')
+  window.navigate('https://picset.example.test/login')
   assert.equal(window.maximizeCalls, 1)
 })
 
 test('defers an authenticated startup maximize until ready to show', () => {
-  const window = createWindowHarness({ visible: false })
+  const window = createWindowHarness()
 
   applyAuthenticatedWindowState({ window, allowedOrigin })
   window.navigate('https://picset.example.test/')
   assert.equal(window.maximizeCalls, 0)
 
   window.readyToShow()
+  assert.equal(window.maximizeCalls, 1)
+  assert.deepEqual(window.lifecycleEvents, ['show', 'maximize'])
+})
+
+test('maximizes after login even when the shown login window is hidden', () => {
+  const window = createWindowHarness()
+
+  applyAuthenticatedWindowState({ window, allowedOrigin })
+  window.navigate('https://picset.example.test/login')
+  window.readyToShow()
+  window.hide()
+  window.navigate('https://picset.example.test/')
+
   assert.equal(window.maximizeCalls, 1)
 })
 

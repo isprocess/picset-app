@@ -121,6 +121,9 @@ including startup with an already-authenticated session. The shell does not
 shrink the window automatically if the user later returns to `/login`. If an
 authenticated startup navigation completes while the window is still hidden,
 maximization waits for `ready-to-show` to avoid displaying an unfinished page.
+The window-state policy handles that event by showing the window before any
+pending maximization, and tracks the first show independently from later
+minimized or hidden states.
 
 The standard persistent Electron session is used. Cookies and browser storage
 therefore remain in the operating system user profile, allowing the existing
