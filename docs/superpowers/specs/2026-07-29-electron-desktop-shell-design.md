@@ -110,6 +110,16 @@ The window uses these mandatory settings:
 - `webSecurity: true`
 - no preload script and no renderer-to-main privileged API
 
+Electron's default application menu is suppressed before the main window is
+created, so the desktop shell does not display the stock File, Edit, View, or
+Window menus.
+
+The unauthenticated `/login` page retains the initial 1440 by 900 window size.
+The main process observes completed same-origin main-frame navigation. The
+first navigation to any pathname other than `/login` maximizes the window,
+including startup with an already-authenticated session. The shell does not
+shrink the window automatically if the user later returns to `/login`.
+
 The standard persistent Electron session is used. Cookies and browser storage
 therefore remain in the operating system user profile, allowing the existing
 same-origin PicSet authentication to operate unchanged.
@@ -223,6 +233,8 @@ The Node test suite covers:
 - generated runtime JSON containing only the expected URL field
 - same-origin navigation allowance and external HTTPS handling
 - rejection of unsafe protocols and cross-origin navigation
+- suppression of Electron's default application menu
+- retention of the login window size and one-time maximization after login
 - tag and package-version equality
 
 The CI release flow verifies the test suite before every platform package and
@@ -244,3 +256,6 @@ authenticate, or require any sensitive configuration.
 6. The tracked repository, Actions logs, and Release assets do not contain
    credentials, certificates, or tokens. The packaged runtime configuration
    contains only the required public service URL and no other server data.
+7. The default Electron application menu is absent, `/login` keeps the initial
+   window size, and the first authenticated same-origin page maximizes the
+   window exactly once.
