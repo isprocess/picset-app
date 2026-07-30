@@ -46,14 +46,14 @@ jobs:
       matrix:
         include:
           - id: macos-x64
-            runner: macos-latest
+            runner: macos-15-intel
             package_script: package:mac:x64
             artifact_name: picset-desktop-macos-x64
             artifact_paths: |
               release/*.dmg
               release/*.zip
           - id: macos-arm64
-            runner: macos-latest
+            runner: macos-15
             package_script: package:mac:arm64
             artifact_name: picset-desktop-macos-arm64
             artifact_paths: |
@@ -177,6 +177,32 @@ jobs:
             fi
           fi
       - run: npm run ${{ matrix.package_script }}
+      - name: Verify macOS disk images
+        if: startsWith(matrix.id, 'macos-')
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          dmg_files=(release/*.dmg)
+          if (( ${#dmg_files[@]} == 0 )); then
+            echo "::error::No macOS disk images were generated."
+            exit 1
+          fi
+
+          for dmg in "${dmg_files[@]}"; do
+            hdiutil verify "$dmg"
+
+            mount_dir="$(mktemp -d "$RUNNER_TEMP/picset-dmg.XXXXXX")"
+            hdiutil attach "$dmg" -readonly -nobrowse -mountpoint "$mount_dir"
+            if [[ ! -d "$mount_dir/PicSet Desktop.app" ]]; then
+              hdiutil detach "$mount_dir"
+              echo "::error::Disk image $dmg does not contain PicSet Desktop.app."
+              exit 1
+            fi
+            hdiutil detach "$mount_dir"
+            rmdir "$mount_dir"
+          done
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ matrix.artifact_name }}
